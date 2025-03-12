@@ -4,6 +4,7 @@ import Dice from '../models/Dice.js';
 import FairNumber from '../models/FairNumber.js';
 import Table from '../utils/Table.js';
 import RandomGenerator from '../models/RandomGenerator.js';
+import Rules from './Rules.js';
 
 class Game {
     queries = {
@@ -86,6 +87,7 @@ class Game {
             this.validate(answer, max);
         }
         if (answer === '?') {
+            Rules.display();
             console.log('Probability of the win for the user:');
             console.log(this.probabilites.toString());
             await this.readline.question('Continue?\n');

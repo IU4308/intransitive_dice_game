@@ -6,7 +6,7 @@ class Table {
     constructor(diceConfig) {
         this.arguments = diceConfig.arguments;
         this.winningChance = new Probabilities(diceConfig.dice)
-        thiss.totalWidth = 100;
+        this.totalWidth = 100;
         this.columnWidth = Math.floor(this.totalWidth / (this.arguments.length + 1));
 
         const colWidths = Array(this.arguments.length + 1).fill(this.columnWidth);
