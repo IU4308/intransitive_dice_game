@@ -44,7 +44,6 @@ class Rules {
         console.log(`|  WINNING THE ROUND      |`);
         console.log(`+-------------------------+`);
         console.log(`- Higher dice throw wins the round.`);
-        console.log(`- Equal values result in a tie.\n`);
 
         console.log(`+----------------+`);
         console.log(`| GAME CONTROLS |`);
