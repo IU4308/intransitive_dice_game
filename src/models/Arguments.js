@@ -1,34 +1,34 @@
 class Arguments {
-    messages = {
-        invNum: "There should be at least 3 dice",
-        invVal: "Values must be positive integers",
-        invSidesNum: "Each dice should have 6 sides",
+    errorMessages = {
+        diceNumber: "There should be at least 3 dice",
+        values: "Values must be positive integers",
+        sidesNumber: "Each dice should have 6 sides",
     }
 
     error = "";
 
     constructor() {
-        this.args = process.argv.slice(2);
+        this.arguments = process.argv.slice(2);
     }
     
     proccessArguments() {
-        if (this.notIntegers(this.args)) {
-            this.addError(this.messages.invVal);
+        if (this.notIntegers(this.arguments)) {
+            this.addError(this.errorMessages.values);
             return;
         }
-        if (this.args.length < 3) {
-            this.addError(this.messages.invNum);
+        if (this.arguments.length < 3) {
+            this.addError(this.errorMessages.diceNumber);
             return;
         } 
         
-        const parsedArgs = this.parseArguments(this.args);
+        const parsedArguments = this.parseArguments(this.arguments);
 
-        if (this.invalidSidesNumber(parsedArgs)) {
-            this.addError(this.messages.invSidesNum);
+        if (this.invalidSidesNumber(parsedArguments)) {
+            this.addError(this.errorMessages.sidesNumber);
             return;
         }
 
-        this.parsedArguments = parsedArgs;
+        this.parsedArguments = parsedArguments;
         return true;
     }
 

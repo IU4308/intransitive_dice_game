@@ -1,14 +1,18 @@
 import CliTable3 from 'cli-table3';
 import chalk from 'chalk';
+import Probabilities from '../models/Probabilities.js';
 
 class Table {
-    constructor(args, probabilities) {
-        const totalWidth = 100;
-        const colWidth = Math.floor(totalWidth / (args.length + 1));
-        const colWidths = Array(args.length + 1).fill(colWidth);
+    constructor(diceConfig) {
+        this.arguments = diceConfig.arguments;
+        this.winningChance = new Probabilities(diceConfig.dice)
+        thiss.totalWidth = 100;
+        this.columnWidth = Math.floor(this.totalWidth / (this.arguments.length + 1));
+
+        const colWidths = Array(this.arguments.length + 1).fill(this.columnWidth);
 
         this.table = new CliTable3({
-            head: ['User dice v', ...args.map(arg => chalk.white(arg))],
+            head: ['User dice v', ...this.arguments.map(arg => chalk.white(arg))],
             colWidths: colWidths,
             style: {
                 head: [],
@@ -16,11 +20,11 @@ class Table {
             },
         });
 
-        probabilities.forEach((el, i) => {
-            el.unshift(args[i]);
+        this.winningChance.forEach((row, i) => {
+            row.unshift(this.arguments[i]);
         });
 
-        this.rows = probabilities;
+        this.rows = this.winningChance;
         this.rows.forEach(row => {
             const coloredRow = row.map((cell, cellIndex) => {
                 if (cellIndex === 0) {

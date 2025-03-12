@@ -1,4 +1,4 @@
-class Probability {
+class Probabilities {
     probabilites = [];
 
     constructor(dice) {
@@ -21,7 +21,9 @@ class Probability {
                 this.probabilites[i][j] = (wins / count).toFixed(2);
             }
         }
+
+        return this.probabilites
     }
 }
 
-export default Probability;
+export default Probabilities;

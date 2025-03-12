@@ -2,7 +2,6 @@ import { stdin, stdout, exit } from 'process';
 import readline from 'readline/promises';
 import Dice from '../models/Dice.js';
 import FairNumber from '../models/FairNumber.js';
-import Probability from '../models/Probability.js';
 import Table from '../utils/Table.js';
 import RandomGenerator from '../models/RandomGenerator.js';
 
@@ -11,20 +10,18 @@ class Game {
         guess: 'Try to guess my selection.\n0 - 0\n1 - 1\nX - exit\n? - help\n',
         add: 'Add your number modulo 6\n0 - 0\n1 - 1\n2 - 2\n3 - 3\n4 - 4\n5 - 5\nX - exit\n? - help\n',
     }
-
     valid = true;
 
     constructor() {
         const diceConfig = new Dice();
         this.dice = diceConfig.dice;
-        this.probsObj = new Probability(this.dice);
-        this.table = new Table(diceConfig.args, this.probsObj.probabilites);
+        this.probabilites = new Table(diceConfig);
         if (diceConfig.error) {
             console.log(diceConfig.error);
             exit();
         }
         this.secret = new FairNumber();
-        this.rl = readline.createInterface({
+        this.readline = readline.createInterface({
             input: stdin,
             output: stdout,
         });
@@ -33,7 +30,7 @@ class Game {
     async startGame() {
         await this.output(["Let's determine who makes the first move."]);
         this.answer = await this.askUser(1, this.queries.guess);
-        this.result = (this.secret.num + Number(this.answer)) % 2;
+        this.result = (this.secret.number + Number(this.answer)) % 2;
         await this.outputGuessResult(this.result, 2);
         if (this.result) {
             await this.output([`Your guess is wrong. I choose first`]);
@@ -55,7 +52,7 @@ class Game {
         } else {
             await this.output([`You win (${this.userResult} > ${this.computerResult})`]);
         }
-        this.rl.close();
+        this.readline.close();
     }
 
     async computerChoose() {
@@ -68,7 +65,7 @@ class Game {
     async userChoose() {
         this.answer = await this.askUser(this.dice.length - 1, 
             "Choose your dice:\n" +
-            this.renderRemainedDice() + '\n',
+            this.renderRemainedDice() + '\nX - exit\n? - help\n',
             false
         );
         this.userDie = this.dice[this.answer];
@@ -79,20 +76,20 @@ class Game {
         if (isGuess) {
             await this.output([
                 `I selected a random value in the range 0..${max}.`,
-                `(HMAC=${this.secret.hmac})`
+                `(HMAC=${this.secret.hash})`
             ]);
         }
-        let answer = await this.rl.question(query);
-        if (answer === '?') {
-            console.log('Probability of the win for the user:');
-            console.log(this.table.toString());
-            await this.rl.question('Continue?\n');
-            answer = await this.askUser(max, query, isGuess);
-        }
+        let answer = await this.readline.question(query);
         this.validate(answer, max);
         while (!this.valid) {
-            answer = await this.rl.question('Invalid input\nTry again\n');
+            answer = await this.readline.question('Invalid input\nTry again\n');
             this.validate(answer, max);
+        }
+        if (answer === '?') {
+            console.log('Probability of the win for the user:');
+            console.log(this.probabilites.toString());
+            await this.readline.question('Continue?\n');
+            answer = await this.askUser(max, query, isGuess);
         }
         return answer;
     }
@@ -114,9 +111,9 @@ class Game {
         this.secret = new FairNumber(32, 0, 6);
         this.answer = await this.askUser(5, this.queries.add);
         if (this.answer.toLowerCase() === 'x') {
-            this.rl.close();
+            this.readline.close();
         }
-        this.result = (this.secret.num + Number(this.answer)) % 6;
+        this.result = (this.secret.number + Number(this.answer)) % 6;
         await this.outputGuessResult(this.result, 6);
     }
 
@@ -136,8 +133,8 @@ class Game {
     async outputGuessResult(result, mod) {
         await this.output([
             `Your selection: ${this.answer}`,
-            `My selection: ${this.secret.num}\n(KEY=${this.secret.key})`,
-            `The result is ${this.secret.num} + ${this.answer} = ` +
+            `My selection: ${this.secret.number}\n(KEY=${this.secret.key})`,
+            `The result is ${this.secret.number} + ${this.answer} = ` +
             `${result} (mod ${mod}).`
         ])
     }  
@@ -152,7 +149,7 @@ class Game {
 
     async output(messages) {
         for (const message of messages) {
-            this.rl.write(`${message}\n`);
+            this.readline.write(`${message}\n`);
             await this.delay(500);
         }
     }
